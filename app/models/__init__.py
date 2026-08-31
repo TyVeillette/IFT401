@@ -1,0 +1,1 @@
+from app.models.stock import Stock
