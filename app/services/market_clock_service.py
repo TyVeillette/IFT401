@@ -8,7 +8,7 @@ CLOCK_ID = 1
 
 
 def utc_now():
-    return datetime.now(timezone.utc)
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 def get_clock():
@@ -39,7 +39,7 @@ def get_simulated_datetime():
     if not clock.is_running:
         return clock.simulated_anchor
 
-    elapsed_real_time = utc_now().replace(tzinfo=None) - clock.real_anchor
+    elapsed_real_time = utc_now() - clock.real_anchor
 
     multiplier = float(clock.speed_multiplier)
 
@@ -57,7 +57,7 @@ def set_simulated_datetime(simulated_datetime):
         return create_clock(simulated_datetime)
 
     clock.simulated_anchor = simulated_datetime
-    clock.real_anchor = utc_now().replace(tzinfo=None)
+    clock.real_anchor = utc_now()
 
     db.session.commit()
 
@@ -73,7 +73,7 @@ def pause_clock():
     current_simulated_time = get_simulated_datetime()
 
     clock.simulated_anchor = current_simulated_time
-    clock.real_anchor = utc_now().replace(tzinfo=None)
+    clock.real_anchor = utc_now()
     clock.is_running = False
 
     db.session.commit()
@@ -87,7 +87,7 @@ def resume_clock():
     if clock is None:
         raise RuntimeError("Market clock has not been configured.")
 
-    clock.real_anchor = utc_now().replace(tzinfo=None)
+    clock.real_anchor = utc_now()
     clock.is_running = True
 
     db.session.commit()
@@ -97,7 +97,9 @@ def resume_clock():
 
 def set_speed_multiplier(multiplier):
     if multiplier <= 0:
-        raise ValueError("Clock speed multiplier must be greater than zero.")
+        raise ValueError(
+            "Clock speed multiplier must be greater than zero."
+        )
 
     clock = get_clock()
 
@@ -107,7 +109,7 @@ def set_speed_multiplier(multiplier):
     current_simulated_time = get_simulated_datetime()
 
     clock.simulated_anchor = current_simulated_time
-    clock.real_anchor = utc_now().replace(tzinfo=None)
+    clock.real_anchor = utc_now()
     clock.speed_multiplier = multiplier
 
     db.session.commit()
