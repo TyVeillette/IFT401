@@ -19,12 +19,17 @@ def create_account():
         username = request.form.get("username")
         email = request.form.get("email")
 
+        # Optional admin checkbox
+        is_admin = request.form.get("is_admin") == "on"
+
         # Required field validation
         if not full_name or not username or not email:
+
             flash(
                 "All fields are required.",
                 "danger"
             )
+
             return render_template(
                 "create_account.html"
             )
@@ -47,11 +52,12 @@ def create_account():
                 email=email
             )
 
-        # Create customer account
+        # Create account
         customer = Customer(
             full_name=full_name,
             username=username,
-            email=email
+            email=email,
+            is_admin=is_admin
         )
 
         db.session.add(customer)
