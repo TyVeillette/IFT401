@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h3>
+        Market Status:
+        <span class="text-success">
+            {{ market_status }}
+        </span>
+    </h3>
+
+    <h2 class="text-center my-5">
+        Market Board
+    </h2>
+
+    <table class="table table-bordered table-striped">
+
+        <thead class="table-dark">
+
+            <tr>
+
+                <th>Ticker</th>
+
+                <th>
+                    Current Price
+                </th>
+
+                <th>Volume</th>
+
+                <th>
+                    Market Cap
+                </th>
+
+                <th>Open</th>
+
+                <th>High</th>
+
+                <th>Low</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for stock in stocks %}
+
+            <tr>
+
+                <td>
+                    {{ stock.ticker }}
+                </td>
+
+                <td>
+                    ${{ "%.2f"|format(stock.current_price) }}
+                </td>
+
+                <td>
+                    {{ "{:,}".format(stock.volume) }}
+                </td>
+
+                <td>
+                    ${{ "{:,.2f}".format(stock.market_cap) }}
+                </td>
+
+                <td>
+                    ${{ "%.2f"|format(stock.opening_price) }}
+                </td>
+
+                <td>
+                    ${{ "%.2f"|format(stock.daily_high) }}
+                </td>
+
+                <td>
+                    ${{ "%.2f"|format(stock.daily_low) }}
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    <div class="text-center mt-4">
+
+        {{ url_for('refresh_market_board') }}
+
+            Refresh
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}
