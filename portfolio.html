@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">
+        View Portfolio
+    </h2>
+
+    <div class="card mb-3">
+        <div class="card-body text-center">
+
+            <h4>
+                Total Portfolio Value:
+                ${{ "{:,.2f}".format(total_portfolio_value) }}
+            </h4>
+
+        </div>
+    </div>
+
+    <div class="card mb-5">
+        <div class="card-body text-center">
+
+            <h4>
+                Available Cash Balance:
+                ${{ "{:,.2f}".format(cash_balance) }}
+            </h4>
+
+        </div>
+    </div>
+
+    <h3 class="mb-3">
+        Portfolio Holdings
+    </h3>
+
+    <table class="table table-bordered table-striped">
+
+        <thead class="table-dark">
+
+            <tr>
+                <th>Ticker</th>
+                <th>Shares</th>
+                <th>Market Price</th>
+                <th>Market Value</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for holding in holdings %}
+
+            <tr>
+
+                <td>
+                    {{ holding.ticker }}
+                </td>
+
+                <td>
+                    {{ holding.shares }}
+                </td>
+
+                <td>
+                    ${{ "%.2f"|format(holding.market_price) }}
+                </td>
+
+                <td>
+                    ${{ "{:,.2f}".format(holding.market_value) }}
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    <div class="alert alert-success mt-4">
+
+        Portfolio displayed successfully.
+
+    </div>
+
+    <div class="alert alert-info">
+
+        Portfolio information is available
+        only to the signed-in user.
+
+    </div>
+
+</div>
+
+{% endblock %}
