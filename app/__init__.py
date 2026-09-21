@@ -13,9 +13,11 @@ def create_app():
     from app import models
 
     from app.routes.order_routes import order_bp
+    from app.routes.admin_market_routes import admin_market_bp
 
     app.register_blueprint(order_bp)
-
+    app.register_blueprint(admin_market_bp)
+    
     @app.route("/health")
     def health():
         return {
