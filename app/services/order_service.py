@@ -149,6 +149,8 @@ def execute_buy_order(order_id):
     db.session.add(transaction)
     db.session.commit()
     
+    return order
+    
 def create_sell_order(customer_id, stock_id, quantity):
     if quantity <= 0:
         raise ValueError("Order quantity must be greater than zero.")
@@ -267,6 +269,8 @@ def execute_sell_order(order_id):
 
     db.session.add(transaction)
     db.session.commit()
+    
+    return order
 
 def process_pending_orders():
     if not is_market_open():
@@ -296,5 +300,3 @@ def process_pending_orders():
             )
 
     return processed_orders
-    
-    return order
