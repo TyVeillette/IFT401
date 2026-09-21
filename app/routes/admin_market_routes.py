@@ -2,6 +2,7 @@ from datetime import datetime
 
 from flask import Blueprint, jsonify, request
 
+from app.services.auth_service import admin_required
 from app.services.market_schedule_service import (
     get_market_hours,
     get_market_schedule,
@@ -42,6 +43,7 @@ def parse_date(value):
 
 
 @admin_market_bp.get("/hours")
+@admin_required
 def market_hours():
     hours = get_market_hours()
 
@@ -66,6 +68,7 @@ def market_hours():
 
 
 @admin_market_bp.post("/hours")
+@admin_required
 def update_market_hours():
     data = request.get_json(silent=True) or request.form
 
@@ -104,6 +107,7 @@ def update_market_hours():
 
 
 @admin_market_bp.get("/schedule/<string:date_value>")
+@admin_required
 def market_schedule(date_value):
     try:
         simulated_date = parse_date(date_value)
@@ -132,6 +136,7 @@ def market_schedule(date_value):
 
 
 @admin_market_bp.post("/holiday")
+@admin_required
 def update_market_holiday():
     data = request.get_json(silent=True) or request.form
 
