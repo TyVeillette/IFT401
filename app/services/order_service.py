@@ -268,4 +268,33 @@ def execute_sell_order(order_id):
     db.session.add(transaction)
     db.session.commit()
 
+def process_pending_orders():
+    if not is_market_open():
+        return []
+
+    pending_orders = (
+        Order.query
+        .filter_by(status="Pending")
+        .order_by(
+            Order.submitted_at.asc(),
+            Order.id.asc(),
+        )
+        .all()
+    )
+
+    processed_orders = []
+
+    for order in pending_orders:
+        if order.order_type == "Buy":
+            processed_orders.append(
+                execute_buy_order(order.id)
+            )
+
+        elif order.order_type == "Sell":
+            processed_orders.append(
+                execute_sell_order(order.id)
+            )
+
+    return processed_orders
+    
     return order
