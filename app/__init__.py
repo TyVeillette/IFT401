@@ -14,10 +14,12 @@ def create_app():
 
     from app.routes.order_routes import order_bp
     from app.routes.admin_market_routes import admin_market_bp
+    from app.routes.cash_account_routes import cash_account_bp
     from app.commands.market_commands import register_market_commands
 
     app.register_blueprint(order_bp)
     app.register_blueprint(admin_market_bp)
+    app.register_blueprint(cash_account_bp)
 
     register_market_commands(app)
 
