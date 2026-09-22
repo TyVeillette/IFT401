@@ -1,6 +1,10 @@
 from flask import Blueprint, jsonify, request
 
 from app.models.order import Order
+from app.services.auth_service import (
+    get_current_customer,
+    login_required,
+)
 from app.services.order_service import (
     cancel_order,
     create_buy_order,
@@ -52,16 +56,17 @@ def serialize_order(order):
 
 
 @order_bp.post("/buy")
+@login_required
 def buy_order():
     data = get_request_data()
+    customer = get_current_customer()
 
     try:
-        customer_id = int(data["customer_id"])
         stock_id = int(data["stock_id"])
         quantity = int(data["quantity"])
 
         order = create_buy_order(
-            customer_id=customer_id,
+            customer_id=customer.id,
             stock_id=stock_id,
             quantity=quantity,
         )
@@ -82,16 +87,17 @@ def buy_order():
 
 
 @order_bp.post("/sell")
+@login_required
 def sell_order():
     data = get_request_data()
+    customer = get_current_customer()
 
     try:
-        customer_id = int(data["customer_id"])
         stock_id = int(data["stock_id"])
         quantity = int(data["quantity"])
 
         order = create_sell_order(
-            customer_id=customer_id,
+            customer_id=customer.id,
             stock_id=stock_id,
             quantity=quantity,
         )
@@ -112,18 +118,14 @@ def sell_order():
 
 
 @order_bp.post("/<int:order_id>/cancel")
+@login_required
 def cancel_customer_order(order_id):
-    data = get_request_data()
+    customer = get_current_customer()
 
     try:
-        customer_id = data.get("customer_id")
-
-        if customer_id is not None:
-            customer_id = int(customer_id)
-
         order = cancel_order(
             order_id=order_id,
-            customer_id=customer_id,
+            customer_id=customer.id,
         )
 
         return jsonify(
@@ -133,7 +135,7 @@ def cancel_customer_order(order_id):
             }
         ), 200
 
-    except (TypeError, ValueError) as exc:
+    except ValueError as exc:
         return jsonify(
             {
                 "error": str(exc),
@@ -141,11 +143,14 @@ def cancel_customer_order(order_id):
         ), 400
 
 
-@order_bp.get("/customer/<int:customer_id>")
-def customer_orders(customer_id):
+@order_bp.get("/history")
+@login_required
+def customer_orders():
+    customer = get_current_customer()
+
     orders = (
         Order.query
-        .filter_by(customer_id=customer_id)
+        .filter_by(customer_id=customer.id)
         .order_by(
             Order.submitted_at.desc(),
             Order.id.desc(),
