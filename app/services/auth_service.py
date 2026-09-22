@@ -15,6 +15,23 @@ def get_current_customer():
     return db.session.get(Customer, customer_id)
 
 
+def login_required(view_function):
+    @wraps(view_function)
+    def wrapped_view(*args, **kwargs):
+        customer = get_current_customer()
+
+        if customer is None:
+            return jsonify(
+                {
+                    "error": "Authentication required.",
+                }
+            ), 401
+
+        return view_function(*args, **kwargs)
+
+    return wrapped_view
+
+
 def admin_required(view_function):
     @wraps(view_function)
     def wrapped_view(*args, **kwargs):

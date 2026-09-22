@@ -115,3 +115,30 @@ def set_speed_multiplier(multiplier):
     db.session.commit()
 
     return clock
+    
+    
+def advance_clock(minutes):
+    if minutes <= 0:
+        raise ValueError(
+            "Advance minutes must be greater than zero."
+        )
+
+    clock = get_clock()
+
+    if clock is None:
+        raise RuntimeError(
+            "Market clock has not been configured."
+        )
+
+    current_simulated_time = get_simulated_datetime()
+
+    clock.simulated_anchor = (
+        current_simulated_time
+        + timedelta(minutes=minutes)
+    )
+
+    clock.real_anchor = utc_now()
+
+    db.session.commit()
+
+    return clock
