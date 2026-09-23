@@ -3,6 +3,7 @@ from werkzeug.security import check_password_hash
 
 from app.extensions import db
 from app.models.customer import Customer
+from app.services.account_service import create_account
 
 auth_bp = Blueprint(
     "auth",
@@ -19,6 +20,39 @@ def serialize_customer(customer):
         "email": customer.email,
         "is_admin": customer.is_admin,
     }
+
+
+@auth_bp.post("/register")
+def register():
+    data = request.get_json(silent=True) or request.form
+
+    try:
+        customer = create_account(
+            full_name=data.get("full_name"),
+            username=data.get("username"),
+            email=data.get("email"),
+            password=data.get("password"),
+        )
+
+    except (AttributeError, TypeError, ValueError) as exc:
+        return jsonify(
+            {
+                "error": str(exc),
+            }
+        ), 400
+
+    # Sign the new customer in, same as a successful login.
+    session.clear()
+    session["customer_id"] = customer.id
+
+    return jsonify(
+        {
+            "message": "Account created. Cash account created.",
+            "customer": serialize_customer(
+                customer
+            ),
+        }
+    ), 201
 
 
 @auth_bp.post("/login")
