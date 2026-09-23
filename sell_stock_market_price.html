@@ -1,0 +1,27 @@
+<form method="POST">
+
+    <div class="mb-3">
+
+        <label class="form-label">
+            Share Quantity
+        </label>
+
+        <input
+            type="number"
+            name="quantity"
+            class="form-control"
+            min="1"
+            max="{{ available_shares }}"
+            required>
+
+    </div>
+
+    <button
+        type="submit"
+        class="btn btn-danger">
+
+        Submit Sell Order
+
+    </button>
+
+</form>

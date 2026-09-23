@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Stock Trading System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: white;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #303030;
+            font-size: 20px;
+        }
+
+        .page {
+            width: 96%;
+            min-height: 1040px;
+            margin: 18px auto;
+            border: 3px solid #222;
+            border-radius: 7px;
+        }
+
+        .header {
+            height: 94px;
+            background: #f3f3f3;
+            border-bottom: 2px solid #444;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 9%;
+            font-weight: 600;
+        }
+
+        .content {
+            padding: 50px 10% 70px;
+        }
+
+        .title {
+            margin-left: 8%;
+            margin-bottom: 54px;
+            font-weight: 600;
+        }
+
+        .current {
+            width: 84%;
+            height: 160px;
+            border: 2px solid #999;
+            border-radius: 6px;
+            background: #fafafa;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            margin-bottom: 40px;
+        }
+
+        .current-title {
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .times {
+            line-height: 1.4;
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            margin: 0 7% 44px;
+        }
+
+        .label {
+            width: 205px;
+            font-weight: 600;
+        }
+
+        .time-input {
+            height: 68px;
+            flex: 1;
+
+            border: 2px solid #999;
+            border-radius: 6px;
+            background: #fafafa;
+
+            text-align: center;
+            font: inherit;
+            color: #333;
+        }
+
+        .hint {
+            text-align: center;
+            margin-top: -20px;
+        }
+
+        .success {
+            width: 84%;
+            height: 64px;
+
+            border: 2px solid #999;
+            border-radius: 6px;
+            background: #fafafa;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin: 155px auto 45px;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="page">
+
+    <header class="header">
+        <div>Stock Trading System</div>
+
+        <div>
+            Market Hours | Admin | Sign Out
+        </div>
+    </header>
+
+    <section class="content">
+
+        <div class="title">
+            Change Market Hours
+        </div>
+
+        <div class="current">
+            <div class="current-title">
+                Current Market Hours
+            </div>
+
+            <div class="times">
+                Market Open: 9:30 AM
+                <br>
+                Market Close: 4:00 PM
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="label" for="open">
+                Market Opening Time
+            </label>
+
+            <input
+                class="time-input"
+                id="open"
+                type="text"
+                value="09:30 AM"
+            >
+        </div>
+
+        <div class="row">
+            <label class="label" for="close">
+                Market Closing Time
+            </label>
+
+            <input
+                class="time-input"
+                id="close"
+                type="text"
+                value="04:00 PM"
+            >
+        </div>
+
+        <div class="hint">
+            Opening must occur before closing.
+        </div>
+
+        <div class="success">
+            Market hours updated successfully.
+        </div>
+
+        <div class="footer-note">
+            Updated hours are applied to pending order execution.
+        </div>
+
+    </section>
+
+</main>
+
+</body>
+</html>

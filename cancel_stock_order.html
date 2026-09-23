@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Pending Orders</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<table class="table table-bordered">
+
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Type</th>
+            <th>Ticker</th>
+            <th>Quantity</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for order in pending_orders %}
+
+        <tr>
+
+            <td>{{ order.id }}</td>
+
+            <td>{{ order.order_type }}</td>
+
+            <td>{{ order.stock.ticker }}</td>
+
+            <td>{{ order.quantity }}</td>
+
+            <td>{{ order.status }}</td>
+
+            <td>
+
+                {{ url_for('cancel_order', order_id=order.id) }}">
+
+                    <button
+                        type="submit"
+                        class="btn btn-danger">
+
+                        Cancel
+
+                    </button>
+
+                </form>
+
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+<script>
+
+function confirmCancel() {
+
+    return confirm(
+        "Are you sure you want to cancel this order?"
+    );
+
+}
+
+</script>
+
+{% endblock %}
