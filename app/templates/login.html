@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-md-5 col-lg-4">
+
+        <h2 class="text-center my-4">
+            Sign In
+        </h2>
+
+        <form method="POST" class="card card-body">
+
+            <div class="mb-3">
+                <label for="username" class="form-label">
+                    Username
+                </label>
+
+                <input
+                    id="username"
+                    name="username"
+                    type="text"
+                    class="form-control"
+                    value="{{ username or '' }}"
+                    autocomplete="username"
+                    required
+                    autofocus>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">
+                    Password
+                </label>
+
+                <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    class="form-control"
+                    autocomplete="current-password"
+                    required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Sign In
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

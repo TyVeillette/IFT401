@@ -17,6 +17,7 @@ def create_app():
     from app.routes.portfolio_routes import portfolio_bp
     from app.routes.market_routes import market_bp
     from app.routes.auth_routes import auth_bp
+    from app.routes.page_routes import page_bp
     from app.commands.market_commands import register_market_commands
 
     app.register_blueprint(order_bp)
@@ -25,6 +26,7 @@ def create_app():
     app.register_blueprint(portfolio_bp)
     app.register_blueprint(market_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(page_bp)
 
     register_market_commands(app)
 

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Sell {{ stock.ticker }}{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+<div class="col-md-7 col-lg-6">
+
+<h2 class="mb-4">
+    Sell {{ stock.ticker }}
+    <small class="text-body-secondary">{{ stock.company_name }}</small>
+</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+
+        <h4>Ticker: {{ stock.ticker }}</h4>
+
+        <h4>
+            Current Price:
+            ${{ "%.2f"|format(stock.current_price) }}
+        </h4>
+
+        <h4 class="mb-0">
+            Available Shares:
+            {{ available_shares }}
+        </h4>
+
+    </div>
+</div>
+
+{% if available_shares > 0 %}
+
+<form method="POST">
+
+    <div class="mb-3">
+
+        <label for="quantity" class="form-label">
+            Share Quantity
+        </label>
+
+        <input
+            id="quantity"
+            type="number"
+            name="quantity"
+            class="form-control"
+            min="1"
+            max="{{ available_shares }}"
+            required>
+
+    </div>
+
+    <button
+        type="submit"
+        class="btn btn-danger">
+
+        Submit Sell Order
+
+    </button>
+
+    <a class="btn btn-link" href="{{ url_for('pages.portfolio') }}">
+        Cancel
+    </a>
+
+</form>
+
+{% else %}
+
+<div class="alert alert-warning">
+    You don't own any shares of {{ stock.ticker }}.
+</div>
+
+{% endif %}
+
+<p class="text-body-secondary mt-4">
+    Final execution price is based on the
+    current market price at execution.
+</p>
+
+</div>
+
+</div>
+
+{% endblock %}

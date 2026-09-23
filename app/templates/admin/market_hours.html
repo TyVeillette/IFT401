@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Change Market Hours{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+<div class="col-md-8 col-lg-6">
+
+<h2 class="mb-4">Change Market Hours</h2>
+
+<div class="card mb-4">
+    <div class="card-body text-center">
+
+        <h5 class="card-title">
+            Current Market Hours
+        </h5>
+
+        {% if market_hours %}
+            <p class="mb-0">
+                Market Open:
+                {{ market_hours.opening_time.strftime("%I:%M %p") }}
+                <br>
+                Market Close:
+                {{ market_hours.closing_time.strftime("%I:%M %p") }}
+            </p>
+        {% else %}
+            <p class="mb-0">
+                Market hours have not been configured.
+            </p>
+        {% endif %}
+
+    </div>
+</div>
+
+<form method="POST" class="card card-body">
+
+    <div class="mb-3">
+        <label for="opening_time" class="form-label">
+            Market Opening Time
+        </label>
+
+        <input
+            id="opening_time"
+            name="opening_time"
+            type="time"
+            class="form-control"
+            value="{{ market_hours.opening_time.strftime('%H:%M') if market_hours else '09:30' }}"
+            required>
+    </div>
+
+    <div class="mb-3">
+        <label for="closing_time" class="form-label">
+            Market Closing Time
+        </label>
+
+        <input
+            id="closing_time"
+            name="closing_time"
+            type="time"
+            class="form-control"
+            value="{{ market_hours.closing_time.strftime('%H:%M') if market_hours else '16:00' }}"
+            required>
+
+        <div class="form-text">
+            Opening must occur before closing.
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Update Market Hours
+    </button>
+
+</form>
+
+<p class="text-center fw-semibold mt-4">
+    Updated hours are applied to pending order execution.
+</p>
+
+</div>
+
+</div>
+
+{% endblock %}

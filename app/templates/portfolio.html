@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block title %}Portfolio{% endblock %}
+
 {% block content %}
 
 <div class="container mt-4">
@@ -13,7 +15,7 @@
 
             <h4>
                 Total Portfolio Value:
-                ${{ "{:,.2f}".format(total_portfolio_value) }}
+                ${{ "{:,.2f}".format(portfolio.total_account_value) }}
             </h4>
 
         </div>
@@ -24,7 +26,7 @@
 
             <h4>
                 Available Cash Balance:
-                ${{ "{:,.2f}".format(cash_balance) }}
+                ${{ "{:,.2f}".format(portfolio.cash_balance) }}
             </h4>
 
         </div>
@@ -34,22 +36,26 @@
         Portfolio Holdings
     </h3>
 
+    <div class="table-responsive">
+
     <table class="table table-bordered table-striped">
 
         <thead class="table-dark">
 
             <tr>
                 <th>Ticker</th>
+                <th>Company</th>
                 <th>Shares</th>
                 <th>Market Price</th>
                 <th>Market Value</th>
+                <th>Trade</th>
             </tr>
 
         </thead>
 
         <tbody>
 
-        {% for holding in holdings %}
+        {% for holding in portfolio.holdings %}
 
             <tr>
 
@@ -58,17 +64,37 @@
                 </td>
 
                 <td>
-                    {{ holding.shares }}
+                    {{ holding.company_name }}
                 </td>
 
                 <td>
-                    ${{ "%.2f"|format(holding.market_price) }}
+                    {{ holding.share_quantity }}
+                </td>
+
+                <td>
+                    ${{ "%.2f"|format(holding.current_price) }}
                 </td>
 
                 <td>
                     ${{ "{:,.2f}".format(holding.market_value) }}
                 </td>
 
+                <td>
+                    <a
+                        class="btn btn-danger btn-sm"
+                        href="{{ url_for('pages.sell_stock', ticker=holding.ticker) }}">
+                        Sell
+                    </a>
+                </td>
+
+            </tr>
+
+        {% else %}
+
+            <tr>
+                <td colspan="6" class="text-center">
+                    You don't own any stocks yet.
+                </td>
             </tr>
 
         {% endfor %}
@@ -76,10 +102,6 @@
         </tbody>
 
     </table>
-
-    <div class="alert alert-success mt-4">
-
-        Portfolio displayed successfully.
 
     </div>
 

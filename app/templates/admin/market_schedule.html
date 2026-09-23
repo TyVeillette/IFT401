@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Change Market Schedule{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+<div class="col-md-8 col-lg-6">
+
+<h2 class="mb-4">Change Market Schedule</h2>
+
+<div class="card mb-4">
+    <div class="card-body text-center">
+
+        <h5 class="card-title">
+            Current Market Schedule
+        </h5>
+
+        <p class="mb-0">
+            Date: {{ selected_date.strftime("%B %d, %Y") }}
+            <br>
+            Day: {{ selected_date.strftime("%A") }}
+            <br>
+            Status:
+            {% if is_holiday %}
+                <span class="text-danger">Holiday</span>
+            {% else %}
+                <span class="text-success">Trading day</span>
+            {% endif %}
+        </p>
+
+    </div>
+</div>
+
+<form method="GET" class="card card-body mb-4">
+
+    <label for="date" class="form-label">
+        Simulated Market Date
+    </label>
+
+    <div class="input-group">
+        <input
+            id="date"
+            name="date"
+            type="date"
+            class="form-control"
+            value="{{ selected_date.isoformat() }}"
+            required>
+
+        <button type="submit" class="btn btn-outline-secondary">
+            Look Up
+        </button>
+    </div>
+
+</form>
+
+<form method="POST" class="card card-body">
+
+    <input
+        type="hidden"
+        name="simulated_date"
+        value="{{ selected_date.isoformat() }}">
+
+    <p>
+        Simulated Market Day:
+        <strong>{{ selected_date.strftime("%A, %m/%d/%Y") }}</strong>
+    </p>
+
+    <div class="form-check mb-3">
+        <input
+            id="is_holiday"
+            name="is_holiday"
+            type="checkbox"
+            class="form-check-input"
+            {{ "checked" if is_holiday }}>
+
+        <label for="is_holiday" class="form-check-label">
+            Enable Holiday
+        </label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Update Market Schedule
+    </button>
+
+</form>
+
+<p class="text-center fw-semibold mt-4">
+    Holiday dates prevent order execution.
+</p>
+
+</div>
+
+</div>
+
+{% endblock %}
