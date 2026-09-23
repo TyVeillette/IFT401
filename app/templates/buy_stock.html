@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Buy {{ stock.ticker }}{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+<div class="col-md-7 col-lg-6">
+
+<h2 class="mb-4">
+    Buy {{ stock.ticker }}
+    <small class="text-body-secondary">{{ stock.company_name }}</small>
+</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+
+        <p>
+            Current Price:
+            ${{ "%.2f"|format(stock.current_price) }}
+        </p>
+
+        <p>
+            Estimated Cost:
+            ${{ "%.2f"|format(stock.current_price) }}
+            × <span id="quantity-label">0</span>
+            = $<span id="estimated-cost">0.00</span>
+        </p>
+
+        <p class="mb-0">
+            Available Cash:
+            ${{ "{:,.2f}".format(cash_account.balance if cash_account else 0) }}
+        </p>
+
+    </div>
+</div>
+
+<form method="POST">
+
+    <div class="mb-3">
+        <label for="quantity" class="form-label">
+            Share Quantity
+        </label>
+
+        <input
+            id="quantity"
+            type="number"
+            class="form-control"
+            name="quantity"
+            min="1"
+            required>
+    </div>
+
+    <button
+        type="submit"
+        class="btn btn-success">
+
+        Submit Buy Order
+
+    </button>
+
+    <a class="btn btn-link" href="{{ url_for('pages.market_board') }}">
+        Cancel
+    </a>
+
+</form>
+
+<p class="text-body-secondary mt-4">
+    Final execution price is based on the
+    current market price at execution.
+</p>
+
+</div>
+
+</div>
+
+<script>
+
+const price = {{ stock.current_price|float }};
+const quantityInput = document.getElementById("quantity");
+
+quantityInput.addEventListener("input", function () {
+
+    const quantity = parseInt(quantityInput.value, 10) || 0;
+
+    document.getElementById("quantity-label").textContent = quantity;
+
+    document.getElementById("estimated-cost").textContent =
+        (price * quantity).toLocaleString(
+            "en-US",
+            { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+        );
+
+});
+
+</script>
+
+{% endblock %}

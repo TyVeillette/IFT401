@@ -26,40 +26,85 @@ RDS requires SSL, so every connection string needs `?sslmode=require`.
 
 You need:
 
-- Your AWS login for the IFT401 account
-- [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) and the [Session Manager plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html)
-- Your credentials saved as a profile: `aws configure --profile ift401`
+- Your IAM user for the IFT401 AWS account (account ID `420151437910`). Ask Ryan if you don't have one.
+- [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html), version 2.32 or later for `aws login`. Check with `aws --version`.
+- The [Session Manager plugin](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html)
+- Python 3
 
-1. Start the tunnel and leave that terminal open. It works in Git Bash, PowerShell, macOS and CloudShell:
+1. Sign the AWS CLI in to the IFT401 account. This saves a profile named `ift401` that the other commands use:
+
+   ```bash
+   aws login --profile ift401
+   ```
+
+   Enter `us-east-1` if it asks for a region. A browser opens: choose **IAM user**, enter account ID `420151437910`, your IAM username and password, then approve the request. If you're already signed in to the console, it only asks you to approve. Check that it worked:
+
+   ```bash
+   aws sts get-caller-identity --profile ift401
+   ```
+
+   The `Arn` should end in `user/<your IAM username>`. The sign-in lasts for your console session length. When commands start failing with `ExpiredToken`, run `aws login --profile ift401` again.
+
+   If your IAM user gets `AccessDenied` on `aws login`, ask Ryan to attach the AWS managed policy `SignInLocalDevelopmentAccess`, or to create an access key for you and use `aws configure --profile ift401` instead.
+
+2. Start the tunnel and leave that terminal open. It works in Git Bash, PowerShell, macOS and CloudShell:
 
    ```bash
    aws ssm start-session --profile ift401 --region us-east-1 --target i-0928910606c87c045 --document-name AWS-StartPortForwardingSessionToRemoteHost --parameters "host=ift401-postgres.c23miiuyiy24.us-east-1.rds.amazonaws.com,portNumber=5432,localPortNumber=5433"
    ```
 
-   Wait for `Waiting for connections...`.
+   Wait for `Waiting for connections...`. The tunnel relays `localhost:5433` on your laptop to the database, through the EC2 server. Session Manager closes the tunnel after about 20 minutes with no traffic. If the app starts failing with `Connection refused`, run this command again.
 
-2. In the repo root, create a `.env` file with only these two lines from `.env.example`, and replace `PASSWORD` with the real one. Ask Tyler for it when you set this up:
+3. In the repo root, create a `.env` file with only these two lines from `.env.example`, and replace `PASSWORD` with the real one. Ask Tyler for it when you set this up:
 
    ```ini
    FLASK_APP=run
    DATABASE_URL=postgresql://ift401admin:PASSWORD@localhost:5433/ift401?sslmode=require
    ```
 
-   `.env` is gitignored. Never commit it, and never put the real password in `.env.example`. Run the app from a second terminal while the tunnel stays open in the first.
+   `.env` is gitignored. Never commit it, and never put the real password in `.env.example`.
 
-3. Optional: check the connection with psql.
+4. In a second terminal, install the packages once and run the app. The tunnel stays open in the first terminal.
+
+   ```bash
+   python -m venv venv
+   source venv/Scripts/activate      # Git Bash. PowerShell: .\venv\Scripts\Activate.ps1  macOS: source venv/bin/activate
+   pip install -r requirements.txt
+   flask run --debug
+   ```
+
+   Open <http://127.0.0.1:5000/health>. It should return `"status": "ok"`.
+
+   Then open <http://127.0.0.1:5000/login> and sign in with a test account:
+
+   | Username | Password | Use it for |
+   |---|---|---|
+   | `demo` | `Password123!` | Customer screens: market board, buy and sell, portfolio, cash, history |
+   | `admin` | `Password123!` | Customer screens plus the Admin menu: create stock, market hours, market schedule |
+
+   These are fake seeded accounts on the shared database, so anything you do with them is visible to the whole team. See [Test data](#test-data) for the other accounts.
+
+5. Optional: check the connection with psql.
 
    ```bash
    psql "host=localhost port=5433 dbname=ift401 user=ift401admin sslmode=require" -c '\dt'
    ```
 
-In CloudShell, leave out `--profile ift401`. To run the tunnel in the background, add `> tunnel.log 2>&1 &` to the end of the command. CloudShell ends idle sessions after about 20 minutes, which also stops the tunnel.
+In CloudShell, skip step 1 and leave out `--profile ift401`. To run the tunnel in the background, add `> tunnel.log 2>&1 &` to the end of the command. CloudShell ends idle sessions after about 20 minutes, which also stops the tunnel.
+
+### Running the tests
+
+Run the tests with `pytest` from the repo root. They use a temporary SQLite database, never RDS. `pytest.ini` limits pytest to the `tests/` folder, and `tests/conftest.py` sets SQLite before the app loads.
+
+Each test drops every table when it finishes. Never run test code or scripts against the `.env` database. Before this setup existed, one `pytest` run with the tunnel open deleted every table on RDS, and it had to be restored from backup. `test_clock.py` in the repo root is a manual script, not a test. It writes to whatever database `.env` points at.
 
 ### Troubleshooting
 
 | Error | Fix |
 |---|---|
-| `Connection refused` on port 5433 | The tunnel isn't running. Start it again. |
+| `The config profile (ift401) could not be found` | Run `aws login --profile ift401` (step 1). |
+| `ExpiredToken` or `Token has expired` | Your sign-in expired. Run `aws login --profile ift401` again. |
+| `Connection refused` on port 5433 | The tunnel isn't running or timed out. Start it again. |
 | `password authentication failed` | Wrong login or password. Check with Tyler. |
 | `no pg_hba.conf entry ... no encryption` | Add `?sslmode=require` to the connection string. |
 | `TargetNotConnected` from `aws ssm` | The EC2 instance is stopped. Start it in the EC2 console. |

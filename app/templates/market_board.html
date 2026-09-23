@@ -1,19 +1,25 @@
 {% extends "base.html" %}
 
+{% block title %}Market Board{% endblock %}
+
 {% block content %}
 
 <div class="container mt-4">
 
     <h3>
         Market Status:
-        <span class="text-success">
-            {{ market_status }}
-        </span>
+        {% if market_open %}
+            <span class="text-success">Open</span>
+        {% else %}
+            <span class="text-danger">Closed</span>
+        {% endif %}
     </h3>
 
     <h2 class="text-center my-5">
         Market Board
     </h2>
+
+    <div class="table-responsive">
 
     <table class="table table-bordered table-striped">
 
@@ -22,6 +28,8 @@
             <tr>
 
                 <th>Ticker</th>
+
+                <th>Company</th>
 
                 <th>
                     Current Price
@@ -39,6 +47,8 @@
 
                 <th>Low</th>
 
+                <th>Trade</th>
+
             </tr>
 
         </thead>
@@ -54,6 +64,10 @@
                 </td>
 
                 <td>
+                    {{ stock.company_name }}
+                </td>
+
+                <td>
                     ${{ "%.2f"|format(stock.current_price) }}
                 </td>
 
@@ -66,17 +80,39 @@
                 </td>
 
                 <td>
-                    ${{ "%.2f"|format(stock.opening_price) }}
+                    ${{ "%.2f"|format(stock.open_price) }}
                 </td>
 
                 <td>
-                    ${{ "%.2f"|format(stock.daily_high) }}
+                    ${{ "%.2f"|format(stock.high_price) }}
                 </td>
 
                 <td>
-                    ${{ "%.2f"|format(stock.daily_low) }}
+                    ${{ "%.2f"|format(stock.low_price) }}
                 </td>
 
+                <td class="text-nowrap">
+                    <a
+                        class="btn btn-success btn-sm"
+                        href="{{ url_for('pages.buy_stock', ticker=stock.ticker) }}">
+                        Buy
+                    </a>
+
+                    <a
+                        class="btn btn-danger btn-sm"
+                        href="{{ url_for('pages.sell_stock', ticker=stock.ticker) }}">
+                        Sell
+                    </a>
+                </td>
+
+            </tr>
+
+        {% else %}
+
+            <tr>
+                <td colspan="9" class="text-center">
+                    No stocks are listed.
+                </td>
             </tr>
 
         {% endfor %}
@@ -85,9 +121,13 @@
 
     </table>
 
+    </div>
+
     <div class="text-center mt-4">
 
-        {{ url_for('refresh_market_board') }}
+        <a
+            class="btn btn-primary"
+            href="{{ url_for('pages.market_board') }}">
 
             Refresh
 

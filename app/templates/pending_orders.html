@@ -1,18 +1,12 @@
 {% extends "base.html" %}
 
+{% block title %}Pending Orders{% endblock %}
+
 {% block content %}
 
-<h2>Pending Orders</h2>
+<h2 class="mb-4">Pending Orders</h2>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <div class="alert alert-{{ category }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
+<div class="table-responsive">
 
 <table class="table table-bordered">
 
@@ -22,6 +16,7 @@
             <th>Type</th>
             <th>Ticker</th>
             <th>Quantity</th>
+            <th>Submitted</th>
             <th>Status</th>
             <th>Action</th>
         </tr>
@@ -29,7 +24,7 @@
 
     <tbody>
 
-    {% for order in pending_orders %}
+    {% for order, ticker in pending_orders %}
 
         <tr>
 
@@ -37,19 +32,25 @@
 
             <td>{{ order.order_type }}</td>
 
-            <td>{{ order.stock.ticker }}</td>
+            <td>{{ ticker }}</td>
 
             <td>{{ order.quantity }}</td>
+
+            <td>{{ order.submitted_at.strftime("%m/%d/%Y %I:%M %p") }}</td>
 
             <td>{{ order.status }}</td>
 
             <td>
 
-                {{ url_for('cancel_order', order_id=order.id) }}">
+                <form
+                    method="POST"
+                    action="{{ url_for('pages.cancel_pending_order', order_id=order.id) }}"
+                    onsubmit="return confirmCancel();"
+                    class="m-0">
 
                     <button
                         type="submit"
-                        class="btn btn-danger">
+                        class="btn btn-danger btn-sm">
 
                         Cancel
 
@@ -61,11 +62,21 @@
 
         </tr>
 
+    {% else %}
+
+        <tr>
+            <td colspan="7" class="text-center">
+                You have no pending orders.
+            </td>
+        </tr>
+
     {% endfor %}
 
     </tbody>
 
 </table>
+
+</div>
 
 <script>
 

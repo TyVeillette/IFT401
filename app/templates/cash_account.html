@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Cash Account{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+<div class="col-md-7 col-lg-6">
+
+<h2 class="mb-4">Cash Account</h2>
+
+<div class="card mb-4">
+    <div class="card-body text-center">
+
+        <h4 class="mb-0">
+            Current Cash Balance:
+            ${{ "{:,.2f}".format(cash_account.balance if cash_account else 0) }}
+        </h4>
+
+    </div>
+</div>
+
+<form method="POST">
+
+    <div class="mb-3">
+        <label for="amount" class="form-label">
+            Amount
+        </label>
+
+        <input
+            id="amount"
+            type="number"
+            class="form-control"
+            name="amount"
+            min="0.01"
+            step="0.01"
+            placeholder="0.00"
+            required>
+    </div>
+
+    <button
+        type="submit"
+        name="action"
+        value="deposit"
+        class="btn btn-success">
+
+        Deposit
+
+    </button>
+
+    <button
+        type="submit"
+        name="action"
+        value="withdraw"
+        class="btn btn-outline-danger">
+
+        Withdraw
+
+    </button>
+
+</form>
+
+</div>
+
+</div>
+
+{% endblock %}

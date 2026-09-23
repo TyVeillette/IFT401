@@ -1,9 +1,27 @@
 from functools import wraps
 
 from flask import jsonify, session
+from werkzeug.security import check_password_hash
 
 from app.extensions import db
 from app.models.customer import Customer
+
+
+def authenticate(username, password):
+    customer = Customer.query.filter_by(
+        username=username
+    ).first()
+
+    if customer is None:
+        return None
+
+    if not check_password_hash(
+        customer.password_hash,
+        password,
+    ):
+        return None
+
+    return customer
 
 
 def get_current_customer():

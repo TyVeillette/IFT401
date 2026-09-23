@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Transaction History{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">Transaction History</h2>
+
+<div class="table-responsive">
+
+<table class="table table-bordered table-striped">
+
+    <thead class="table-dark">
+        <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Ticker</th>
+            <th>Shares</th>
+            <th>Price per Share</th>
+            <th>Amount</th>
+            <th>Cash Balance</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for transaction, ticker in transactions %}
+
+        <tr>
+
+            <td>
+                {{ transaction.transaction_date.strftime("%m/%d/%Y %I:%M %p") }}
+            </td>
+
+            <td>{{ transaction.transaction_type }}</td>
+
+            <td>{{ ticker or "" }}</td>
+
+            <td>{{ transaction.share_quantity or "" }}</td>
+
+            <td>
+                {% if transaction.price_per_share is not none %}
+                    ${{ "%.2f"|format(transaction.price_per_share) }}
+                {% endif %}
+            </td>
+
+            <td class="{{ 'text-danger' if transaction.amount < 0 else 'text-success' }}">
+                {{ "-" if transaction.amount < 0 }}${{ "{:,.2f}".format(transaction.amount|abs) }}
+            </td>
+
+            <td>
+                ${{ "{:,.2f}".format(transaction.resulting_cash_balance) }}
+            </td>
+
+        </tr>
+
+    {% else %}
+
+        <tr>
+            <td colspan="7" class="text-center">
+                No transactions yet.
+            </td>
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+</div>
+
+{% endblock %}
