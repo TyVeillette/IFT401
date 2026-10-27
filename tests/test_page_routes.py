@@ -172,6 +172,79 @@ def test_login_ignores_external_next_url(app, client):
         )
 
 
+REGISTRATION = {
+    "full_name": "Page Registration",
+    "username": "pagesignup",
+    "email": "pagesignup@example.com",
+    "password": "Password123!",
+    "confirm_password": "Password123!",
+}
+
+
+def test_register_page_creates_account_and_signs_in(app, client):
+    with app.app_context():
+        response = client.post(
+            "/register",
+            data=REGISTRATION,
+        )
+
+        assert response.status_code == 302
+        assert response.headers["Location"].endswith(
+            "/cash-account"
+        )
+
+        customer = Customer.query.filter_by(
+            username="pagesignup"
+        ).one()
+
+        assert customer.is_admin is False
+        assert CashAccount.query.filter_by(
+            customer_id=customer.id
+        ).one().balance == Decimal("0.00")
+
+        with client.session_transaction() as session:
+            assert session["customer_id"] == customer.id
+
+
+def test_register_page_rejects_mismatched_passwords(app, client):
+    with app.app_context():
+        response = client.post(
+            "/register",
+            data={
+                **REGISTRATION,
+                "confirm_password": "Different123!",
+            },
+        )
+
+        assert response.status_code == 400
+        assert b"Passwords do not match." in response.data
+        assert Customer.query.count() == 0
+
+
+def test_register_page_rejects_taken_username_and_keeps_input(app, client):
+    with app.app_context():
+        create_customer(username="pagesignup")
+
+        response = client.post(
+            "/register",
+            data={
+                **REGISTRATION,
+                "email": "different@example.com",
+            },
+        )
+
+        assert response.status_code == 400
+        assert b"Username unavailable" in response.data
+        assert b'value="Page Registration"' in response.data
+        assert b"Password123!" not in response.data
+
+
+def test_login_page_links_to_register(client):
+    response = client.get("/login")
+
+    assert b'href="/register"' in response.data
+
+
 def test_market_board_page(app, client):
     with app.app_context():
         customer = create_customer()

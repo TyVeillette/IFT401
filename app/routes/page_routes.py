@@ -16,6 +16,7 @@ from app.models.portfolio_holding import PortfolioHolding
 from app.models.stock import Stock
 from app.models.transaction import Transaction
 from app.routes.admin_market_routes import parse_date, parse_time
+from app.services.account_service import create_account
 from app.services.admin_stock_service import create_stock
 from app.services.auth_service import (
     authenticate,
@@ -152,6 +153,46 @@ def login():
         return redirect(url_for("pages.market_board"))
 
     return render_template("login.html")
+
+
+@page_bp.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        form = request.form
+
+        try:
+            if form.get("password") != form.get("confirm_password"):
+                raise ValueError("Passwords do not match.")
+
+            customer = create_account(
+                full_name=form.get("full_name"),
+                username=form.get("username"),
+                email=form.get("email"),
+                password=form.get("password"),
+            )
+
+        except ValueError as exc:
+            flash(str(exc), "danger")
+
+            return render_template(
+                "register.html",
+                form=form,
+            ), 400
+
+        session.clear()
+        session["customer_id"] = customer.id
+
+        flash(
+            "Account created successfully. Cash account created.",
+            "success",
+        )
+
+        return redirect(url_for("pages.cash_account"))
+
+    return render_template(
+        "register.html",
+        form={},
+    )
 
 
 @page_bp.post("/logout")
